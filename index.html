@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Tap Rush ⚡</title>
+    
+    <!-- Modern SVG Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%2339ff14'/><path d='M54 22 L32 55 L48 55 L42 78 L66 45 L50 45 Z' fill='%230a0a12'/></svg>">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neon: { green: '#39ff14', blue: '#00f3ff', purple: '#bc13fe', gold: '#ffd700' },
+                        dark: '#0a0a12'
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+                    },
+                    animation: {
+                        'breathe': 'breathe 2s ease-in-out infinite',
+                        'bounce-fast': 'bounce 0.8s infinite',
+                    },
+                    keyframes: {
+                        breathe: {
+                            '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 15px rgba(57, 255, 20, 0.5)' },
+                            '50%': { transform: 'scale(1.02)', boxShadow: '0 0 25px rgba(57, 255, 20, 0.8)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a12 100%);
+            color: white;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #39ff14, #00f3ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Dynamic Tap Button Styles */
+        #tap-btn {
+            --btn-scale: 1;
+            transform: scale(var(--btn-scale));
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s linear, left 0.15s ease-out, top 0.15s ease-out;
+        }
+        #tap-btn:active {
+            --btn-scale: calc(var(--btn-scale) * 0.92);
+        }
+
+        /* Ripple Effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-anim 0.4s linear;
+            background-color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+        }
+        @keyframes ripple-anim {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* Animations */
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0) rotate(0); }
+            25% { transform: translate(2px, 2px) rotate(1deg); }
+            50% { transform: translate(-2px, -2px) rotate(-1deg); }
+            75% { transform: translate(-2px, 2px) rotate(1deg); }
+        }
+        .shake-active { animation: shake var(--shake-speed, 0.1s) infinite; }
+        
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse-fast {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .timer-danger { animation: pulse-fast 0.5s infinite; color: #ff3333; }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
+            transform-origin: center;
+        }
+
+        /* Splash Screen Loading Animation */
+        @keyframes splashLoad {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        .animate-splash-load {
+            animation: splashLoad 2.5s ease-in-out forwards;
+        }
+
+        /* Advanced Visual Effects */
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-50px) scale(1.5) rotate(5deg); opacity: 0; }
+        }
+        .animate-float-up { animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+        @keyframes flash {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(255, 255, 255, 0.2); }
+        }
+        .flash-active { animation: flash 0.15s ease-out; }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .powerup-spawn { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        .bg-glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: orbit 10s linear infinite alternate;
+        }
+        @keyframes orbit {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(50px, -50px) scale(1.2); }
+        }
+
+        #confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+        .h-screen-dynamic { height: 100dvh; }
+    </style>
+</head>
+<body class="min-h-screen w-full flex flex-col items-center justify-center relative bg-dark">
+
+    <!-- Background Effects -->
+    <div id="bg-effects" class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="bg-glow-orb w-64 h-64 bg-neon-purple top-10 left-10"></div>
+        <div class="bg-glow-orb w-80 h-80 bg-neon-blue bottom-10 right-10" style="animation-delay: -5s;"></div>
+        <div id="flash-overlay" class="absolute inset-0 z-50 pointer-events-none transition-colors duration-75"></div>
+    </div>
+
+    <div id="game-container" class="w-full h-screen-dynamic max-w-md mx-auto relative flex flex-col items-center justify-center p-4 sm:p-6 transition-opacity duration-300 z-10">
+
+        <!-- 0. SPLASH SCREEN -->
+        <div id="splash-screen" class="w-full h-full flex flex-col items-center justify-center absolute inset-0 z-[100] bg-dark">
+            <div class="relative w-32 h-32 sm:w-40 sm:h-40 mb-6 drop-shadow-[0_0_20px_rgba(57,255,20,0.8)] animate-breathe">
+                <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <defs>
+                        <linearGradient id="splash-logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#39ff14;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00b300;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="46" fill="none" stroke="#00f3ff" stroke-width="3" stroke-dasharray="15 10" class="animate-spin-slow" />
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(0,243,255,0.2)" stroke-width="1" />
+                    <circle cx="50" cy="50" r="34" fill="url(#splash-logo-grad)" />
+                    <path d="M54 22 L32 55 L48 55 L42 78 L66 45 L50 45 Z" fill="#0a0a12" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h1 class="text-6xl sm:text-7xl font-black mb-10 tracking-tight italic text-gradient text-center">Tap Rush</h1>
+            
+            <div class="w-48 sm:w-64 h-2 bg-gray-800 rounded-full overflow-hidden shadow-[0_0_10px_#00f3ff]">
+                <div class="h-full bg-neon-blue rounded-full animate-splash-load"></div>
+            </div>
+            <p class="text-neon-blue text-sm mt-4 font-bold animate-pulse tracking-widest uppercase">Loading System...</p>
+        </div>
+
+        <!-- 1. USERNAME SCREEN -->
+        <div id="name-screen" class="hidden w-full h-full flex flex-col items-center justify-center fade-in absolute inset-0 p-4 sm:p-6 z-50 glass">
+            <h2 class="text-4xl font-black mb-2 text-white text-center">Welcome!</h2>
+            <p class="text-gray-400 mb-8 text-center text-sm">Enter your player name to join the global leaderboard.</p>
+            
+            <input type="text" id="input-name" maxlength="12" placeholder="e.g. SpeedNinja" class="w-full bg-dark/80 border border-gray-600 rounded-xl p-4 text-white text-center text-xl font-bold mb-6 focus:outline-none focus:border-neon-blue transition-colors placeholder-gray-600">
+            
+            <button id="btn-save-name" class="w-full bg-neon-blue text-black text-xl font-black py-4 rounded-full shadow-[0_0_15px_#00f3ff] hover:scale-105 active:scale-95 transition-transform uppercase tracking-wider">
+                Continue
+            </button>
+            <p class="mt-4 text-xs text-gray-500">Leave blank to play as Guest</p>
+        </div>
+
+        <!-- 2. START SCREEN -->
+        <div id="start-screen" class="hidden w-full h-full flex flex-col items-center justify-center fade-in absolute inset-0 p-4 sm:p-6 z-10">
+            
+            <div class="relative w-24 h-24 sm:w-32 sm:h-32 mb-2 sm:mb-4 drop-shadow-[0_0_15px_rgba(57,255,20,0.6)]">
+                <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <defs>
+                        <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#39ff14;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00b300;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="46" fill="none" stroke="#00f3ff" stroke-width="3" stroke-dasharray="15 10" class="animate-spin-slow" />
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(0,243,255,0.3)" stroke-width="1" />
+                    <circle cx="50" cy="50" r="34" fill="url(#logo-grad)" />
+                    <path d="M54 22 L32 55 L48 55 L42 78 L66 45 L50 45 Z" fill="#0a0a12" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <h1 class="text-5xl sm:text-6xl font-black mb-1 sm:mb-2 tracking-tight italic text-gradient text-center">Tap Rush</h1>
+            <p id="difficulty-indicator" class="text-xs sm:text-sm text-gray-400 mb-4 font-bold text-center transition-colors">Only 1% reach Legend 👑</p>
+
+            <div class="glass w-full rounded-2xl p-4 sm:p-6 mb-4 text-center shadow-glass flex justify-between items-center relative overflow-hidden">
+                <div class="text-left z-10">
+                    <p class="text-xs sm:text-sm text-gray-400 uppercase tracking-widest">Best Score</p>
+                    <p id="best-score-display" class="text-2xl sm:text-3xl font-bold text-neon-green">—</p>
+                </div>
+                <div class="text-right z-10">
+                    <p class="text-xs sm:text-sm text-gray-400 uppercase tracking-widest">Rank</p>
+                    <p id="best-rank-display" class="text-lg sm:text-xl font-bold text-white">🐢 Beginner</p>
+                    <p id="progression-start" class="text-[10px] sm:text-xs text-neon-blue mt-1 font-bold">Play to rank up!</p>
+                </div>
+            </div>
+
+            <!-- Game Mode Selector -->
+            <div class="w-full mb-4 z-10">
+                <div class="flex justify-center gap-2 bg-dark/80 p-1 rounded-full border border-gray-700 shadow-glass">
+                    <button id="mode-classic" class="mode-btn flex-1 py-2 rounded-full text-xs sm:text-sm font-bold bg-neon-blue text-black transition-all">Classic</button>
+                    <button id="mode-endless" class="mode-btn flex-1 py-2 rounded-full text-xs sm:text-sm font-bold text-gray-400 hover:text-white transition-all">Endless</button>
+                    <button id="mode-precision" class="mode-btn flex-1 py-2 rounded-full text-xs sm:text-sm font-bold text-gray-400 hover:text-white transition-all">Precision</button>
+                </div>
+            </div>
+
+            <!-- Global Leaderboard -->
+            <div class="w-full mb-6 flex-1 min-h-0 flex flex-col">
+                <div class="flex justify-between items-end mb-2">
+                    <h3 class="text-xs sm:text-sm text-gray-400 uppercase tracking-widest"><span id="mode-lb-title">Classic</span> Leaderboard</h3>
+                    <span id="global-rank-status" class="text-[10px] sm:text-xs font-bold text-neon-gold hidden drop-shadow-[0_0_5px_#ffd700]">Your Rank: #?</span>
+                </div>
+                <div class="glass rounded-xl p-3 sm:p-4 space-y-2 sm:space-y-3 overflow-y-auto" id="leaderboard">
+                    <div class="text-center text-gray-400 text-sm py-2 animate-pulse">Loading Database...</div>
+                </div>
+            </div>
+
+            <button id="btn-start" class="w-full bg-neon-green text-black text-xl sm:text-2xl font-black py-3 sm:py-4 rounded-full animate-breathe uppercase tracking-wider mt-auto sm:mt-0 flex items-center justify-center gap-2">
+                <svg class="w-6 h-6 sm:w-8 sm:h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                Start Game
+            </button>
+        </div>
+
+        <!-- 3. COUNTDOWN SCREEN -->
+        <div id="countdown-screen" class="hidden absolute inset-0 flex items-center justify-center z-20 fade-in">
+            <h2 id="countdown-text" class="text-8xl sm:text-[120px] font-black text-white drop-shadow-[0_0_20px_#00f3ff]">3</h2>
+        </div>
+
+        <!-- 4. GAME SCREEN -->
+        <div id="game-screen" class="hidden w-full h-full flex-col items-center justify-between py-6 sm:py-10 z-10 fade-in relative">
+            
+            <div id="floating-text-layer" class="absolute inset-0 pointer-events-none z-40 overflow-hidden"></div>
+            <div id="powerups-layer" class="absolute inset-0 pointer-events-none z-30"></div>
+
+            <div class="w-full flex justify-between items-end px-2 sm:px-4 z-20 pointer-events-none">
+                <div class="flex flex-col">
+                    <span class="text-xs sm:text-sm text-gray-400 font-bold uppercase tracking-widest">Time</span>
+                    <span id="timer" class="text-3xl sm:text-4xl font-black transition-transform">10.0</span>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-xs sm:text-sm text-gray-400 font-bold uppercase tracking-widest">Combo</span>
+                    <span id="combo-display" class="text-xl sm:text-2xl font-black text-neon-purple transition-transform">x1</span>
+                </div>
+            </div>
+
+            <div class="w-full bg-gray-800 h-1.5 sm:h-2 mt-2 rounded-full overflow-hidden mx-2 sm:mx-4 shrink-0 z-20 pointer-events-none">
+                <div id="progress-bar" class="h-full bg-neon-blue w-full transition-all ease-linear duration-100"></div>
+            </div>
+
+            <div class="flex-1 flex flex-col justify-center items-center shrink-0 min-h-0 py-2 sm:py-0 z-20 pointer-events-none">
+                <span class="text-xs sm:text-sm text-gray-400 font-bold uppercase tracking-widest">Score</span>
+                <span id="live-score" class="text-7xl sm:text-8xl md:text-[100px] font-black leading-none drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">0</span>
+            </div>
+
+            <div class="flex flex-col items-center justify-center shrink-0 pb-4 z-20 w-full relative h-64">
+                <button id="tap-btn" class="absolute w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-full bg-gradient-to-br from-[#39ff14] to-[#00b300] flex items-center justify-center overflow-hidden touch-manipulation shadow-[0_0_15px_rgba(57,255,20,0.5)] z-50">
+                    <span class="text-black text-3xl sm:text-4xl font-black uppercase tracking-widest pointer-events-none">Tap!</span>
+                </button>
+            </div>
+            
+            <p id="game-hint" class="mt-4 sm:mt-6 text-gray-500 text-xs sm:text-sm pointer-events-none z-20">Tap as fast as you can!</p>
+        </div>
+
+        <!-- 5. END SCREEN -->
+        <div id="end-screen" class="hidden w-full h-full flex-col items-center justify-center absolute inset-0 p-4 sm:p-6 z-30 glass fade-in">
+            <h2 class="text-3xl sm:text-4xl font-black mb-1 sm:mb-2 text-white text-center">TIME'S UP!</h2>
+            
+            <div class="bg-dark/80 w-full rounded-2xl sm:rounded-3xl p-6 sm:p-8 mb-6 sm:mb-8 text-center shadow-glass border border-gray-700 mt-4 sm:mt-6 relative">
+                <p class="text-gray-400 text-sm sm:text-lg uppercase tracking-widest mb-1 sm:mb-2"><span id="end-mode-text">Classic</span> Score</p>
+                <p id="final-score" class="text-6xl sm:text-[80px] font-black leading-none text-neon-green mb-3 sm:mb-4 drop-shadow-[0_0_15px_#39ff14]">0</p>
+                
+                <div class="inline-block bg-white/10 rounded-full px-4 sm:px-6 py-1 sm:py-2 flex-col justify-center">
+                    <p id="rank-display" class="text-xl sm:text-2xl font-bold text-white">🐢 Beginner</p>
+                </div>
+                <p id="progression-end" class="text-xs sm:text-sm text-neon-blue mt-3 font-bold"></p>
+
+                <!-- High Score Alert -->
+                <div id="new-high-score-msg" class="hidden absolute -top-4 left-1/2 transform -translate-x-1/2 bg-neon-purple text-white px-4 py-1 rounded-full text-sm font-black tracking-widest border-2 border-white shadow-[0_0_20px_#bc13fe] animate-bounce-fast whitespace-nowrap">
+                    🔥 NEW HIGH SCORE!
+                </div>
+            </div>
+
+            <div class="w-full space-y-3 sm:space-y-4">
+                <button id="btn-play-again" class="w-full bg-neon-blue text-black text-lg sm:text-xl font-black py-3 sm:py-4 rounded-full shadow-[0_0_15px_#00f3ff] hover:scale-105 active:scale-95 transition-transform uppercase">
+                    Play Again
+                </button>
+                <button id="btn-share" class="w-full bg-[#25D366] text-white text-lg sm:text-xl font-black py-3 sm:py-4 rounded-full shadow-[0_0_15px_#25D366] hover:scale-105 active:scale-95 transition-transform uppercase flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24"><path d="M12.031 0C5.385 0 0 5.385 0 12.031c0 2.115.549 4.167 1.593 5.986L.045 23.955l6.096-1.599c1.761.942 3.737 1.444 5.89 1.444 6.646 0 12.031-5.385 12.031-12.031S18.677 0 12.031 0zm3.877 17.26c-.161.455-.935.893-1.319.932-.383.039-1.042.083-3.321-.861-2.735-1.133-4.52-3.921-4.656-4.103-.136-.182-1.111-1.48-1.111-2.822 0-1.342.695-2.007.942-2.261.247-.254.538-.318.719-.318.182 0 .363.001.52.008.169.007.396-.065.621.479.227.545.772 1.889.842 2.031.071.143.117.311.026.493-.091.182-.136.292-.272.454-.136.162-.286.344-.409.48-.136.143-.286.299-.123.584.162.285.719 1.195 1.545 1.934 1.066.955 1.961 1.253 2.247 1.396.286.143.454.123.623-.065.169-.188.733-.857.928-1.149.195-.292.39-.247.65-.149.26.097 1.642.779 1.928.922.286.143.474.214.545.337.071.123.071.714-.09 1.169z"/></svg>
+                    Challenge Friend
+                </button>
+                <button id="btn-home" class="w-full bg-transparent border-2 border-gray-600 text-gray-300 text-lg sm:text-xl font-black py-3 sm:py-4 rounded-full hover:bg-white/5 active:scale-95 transition-all uppercase flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    Back to Home
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <canvas id="confetti"></canvas>
+
+    <!-- JS MODULE (Includes Firebase + Game Logic) -->
+    <script type="module">
+        // ==========================================
+        // 1. FIREBASE INITIALIZATION
+        // ==========================================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // 🔴 PASTE YOUR FIREBASE CONFIG HERE:
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        let db = null;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+        } catch (error) {
+            console.error("Firebase not configured correctly yet:", error);
+        }
+
+        // ==========================================
+        // 2. GAME STATE & DOM ELEMENTS
+        // ==========================================
+        const state = {
+            userId: localStorage.getItem('tapRushUid'),
+            username: localStorage.getItem('tapRushName'),
+            hasPlayed: localStorage.getItem('tapRushPlayed') === 'true',
+            
+            // Mode-specific High Scores
+            bestScores: {
+                classic: parseInt(localStorage.getItem('tapRushBest_classic')) || parseInt(localStorage.getItem('tapRushBest')) || 0,
+                endless: parseInt(localStorage.getItem('tapRushBest_endless')) || 0,
+                precision: parseInt(localStorage.getItem('tapRushBest_precision')) || 0
+            },
+            gameMode: 'classic', // classic, endless, precision
+            
+            // Active Game Variables
+            score: 0,
+            timeLeft: 10.0,
+            combo: 1,
+            multiplier: 1,
+            timeScale: 1,
+            lastTapTime: 0,
+            timerInterval: null,
+            powerUpTimer: null,
+            gameActive: false,
+            
+            // Anti-Cheat
+            lastRealTap: 0,
+            tapsThisSecond: 0,
+            lastTapSecond: 0,
+            currentDifficulty: null
+        };
+
+        const els = {
+            screens: {
+                splash: document.getElementById('splash-screen'),
+                name: document.getElementById('name-screen'),
+                start: document.getElementById('start-screen'),
+                countdown: document.getElementById('countdown-screen'),
+                game: document.getElementById('game-screen'),
+                end: document.getElementById('end-screen')
+            },
+            container: document.getElementById('game-container'),
+            bestScore: document.getElementById('best-score-display'),
+            bestRank: document.getElementById('best-rank-display'),
+            progressionStart: document.getElementById('progression-start'),
+            progressionEnd: document.getElementById('progression-end'),
+            leaderboard: document.getElementById('leaderboard'),
+            globalRank: document.getElementById('global-rank-status'),
+            diffIndicator: document.getElementById('difficulty-indicator'),
+            modeLbTitle: document.getElementById('mode-lb-title'),
+            countdownTxt: document.getElementById('countdown-text'),
+            timer: document.getElementById('timer'),
+            progress: document.getElementById('progress-bar'),
+            liveScore: document.getElementById('live-score'),
+            combo: document.getElementById('combo-display'),
+            tapBtn: document.getElementById('tap-btn'),
+            finalScore: document.getElementById('final-score'),
+            rank: document.getElementById('rank-display'),
+            highScoreMsg: document.getElementById('new-high-score-msg'),
+            inputName: document.getElementById('input-name'),
+            endModeText: document.getElementById('end-mode-text'),
+            gameHint: document.getElementById('game-hint')
+        };
+
+        // ==========================================
+        // 3. AUDIO SYSTEM
+        // ==========================================
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playSound(type) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+            
+            if (type === 'tap') {
+                osc.type = 'sine';
+                const freq = Math.min(600 + (state.combo * 80), 2000); 
+                osc.frequency.setValueAtTime(freq, now);
+                osc.frequency.exponentialRampToValueAtTime(freq + 200, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'powerup') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.linearRampToValueAtTime(1200, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'miss') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'countdown') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'go') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(880, now);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'end') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.5);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+        }
+
+        // ==========================================
+        // 4. DIFFICULTY, RANK & UI UPDATES
+        // ==========================================
+        
+        function getDifficultySettings(score) {
+            if (score < 30) return { rank: '🐢 Beginner', time: 10.0, comboWindow: 300, nextRankReq: 30, nextRankName: 'Pro' };
+            if (score < 60) return { rank: '🔥 Pro', time: 8.0, comboWindow: 250, nextRankReq: 60, nextRankName: 'Legend' };
+            return { rank: '👑 Legend', time: 6.0, comboWindow: 200, nextRankReq: null, nextRankName: null };
+        }
+
+        function getProgressionText(score) {
+            if (!state.hasPlayed) return "Play your first game to rank up!";
+            const diff = getDifficultySettings(score);
+            if (diff.nextRankReq) return `${diff.nextRankReq - score} points to ${diff.nextRankName}`;
+            return "Max rank achieved! 👑";
+        }
+
+        function switchScreen(screenName) {
+            Object.values(els.screens).forEach(s => s.classList.add('hidden'));
+            const targetScreen = els.screens[screenName];
+            targetScreen.classList.remove('hidden');
+            targetScreen.classList.remove('fade-in');
+            void targetScreen.offsetWidth; 
+            targetScreen.classList.add('fade-in');
+        }
+
+        function generateUid() { return 'user_' + Date.now() + Math.floor(Math.random() * 1000); }
+
+        async function fetchLeaderboard() {
+            if (!db) {
+                els.leaderboard.innerHTML = `<div class="text-center text-gray-400 text-sm py-4 italic">Leaderboard offline. Add Firebase config.</div>`;
+                return;
+            }
+            try {
+                // Fetch leaderboard for the currently selected game mode
+                const collectionName = `leaderboard_${state.gameMode}`;
+                const q = query(collection(db, collectionName), orderBy("score", "desc"), limit(10));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    els.leaderboard.innerHTML = `<div class="text-center text-gray-400 text-sm py-4 italic">No players in this mode yet!</div>`;
+                    els.globalRank.classList.add('hidden');
+                    return;
+                }
+
+                let html = '';
+                let rank = 1;
+                let userGlobalRank = null;
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const isMe = docSnap.id === state.userId;
+                    if (isMe) userGlobalRank = rank;
+
+                    html += `
+                        <div class="flex justify-between items-center text-xs sm:text-sm ${isMe ? 'bg-neon-blue/20 border border-neon-blue/50 p-2 rounded-lg transform scale-[1.02] transition-transform' : 'p-2'}">
+                            <span class="${isMe ? 'text-neon-blue font-black' : 'text-gray-300'}">
+                                <span class="${isMe ? 'text-white' : 'text-neon-blue'} mr-2">#${rank}</span> ${data.name} ${isMe ? '(You)' : ''}
+                            </span>
+                            <span class="font-bold ${isMe ? 'text-neon-blue' : 'text-white'}">${data.score} pts</span>
+                        </div>
+                    `;
+                    rank++;
+                });
+
+                els.leaderboard.innerHTML = html;
+
+                if (userGlobalRank) {
+                    els.globalRank.innerText = `Your Rank: #${userGlobalRank} 🌍`;
+                    els.globalRank.classList.remove('hidden');
+                } else {
+                    els.globalRank.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error("Error fetching leaderboard: ", error);
+                els.leaderboard.innerHTML = `<div class="text-center text-gray-400 text-sm py-2">Failed to load leaderboard</div>`;
+            }
+        }
+
+        async function saveScoreToFirebase() {
+            if (!db || !state.userId || !state.username) return;
+            try {
+                const collectionName = `leaderboard_${state.gameMode}`;
+                await setDoc(doc(db, collectionName, state.userId), {
+                    name: state.username,
+                    score: state.bestScores[state.gameMode],
+                    timestamp: new Date()
+                }, { merge: true });
+            } catch (error) {
+                console.error("Error saving score: ", error);
+            }
+        }
+
+        function updateStartScreenUI() {
+            const currentBest = state.bestScores[state.gameMode];
+            const currentSettings = getDifficultySettings(currentBest);
+            
+            els.bestScore.innerText = currentBest > 0 || state.hasPlayed ? currentBest : "—";
+            els.bestRank.innerText = currentBest > 0 || state.hasPlayed ? currentSettings.rank : "🐢 Beginner";
+            els.progressionStart.innerText = getProgressionText(currentBest);
+            
+            els.modeLbTitle.innerText = state.gameMode.charAt(0).toUpperCase() + state.gameMode.slice(1);
+            
+            if((currentBest > 0 || state.hasPlayed) && currentSettings.time < 10 && state.gameMode === 'classic') {
+                els.diffIndicator.innerText = `Difficulty Level: ${currentSettings.rank} (${currentSettings.time}s)`;
+                els.diffIndicator.classList.add('text-neon-blue');
+            } else if (state.gameMode === 'endless') {
+                els.diffIndicator.innerText = `Endless: Timer drains faster over time!`;
+                els.diffIndicator.classList.add('text-neon-purple');
+            } else if (state.gameMode === 'precision') {
+                els.diffIndicator.innerText = `Precision: Catch the moving button!`;
+                els.diffIndicator.classList.add('text-neon-gold');
+            }
+
+            fetchLeaderboard();
+        }
+
+        function handleSaveName() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            
+            let name = els.inputName.value.trim();
+            if (!name) name = "Guest" + Math.floor(Math.random() * 10000);
+            
+            state.username = name;
+            state.userId = generateUid();
+            
+            localStorage.setItem('tapRushName', state.username);
+            localStorage.setItem('tapRushUid', state.userId);
+            
+            updateStartScreenUI();
+            switchScreen('start');
+        }
+
+        // ==========================================
+        // 5. GAME FLOW & ADVANCED MECHANICS
+        // ==========================================
+
+        function showFloatingText(text, x, y, color = '#39ff14') {
+            const el = document.createElement('div');
+            el.innerText = text;
+            el.className = 'absolute font-black text-2xl sm:text-3xl drop-shadow-lg animate-float-up pointer-events-none';
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            el.style.color = color;
+            document.getElementById('floating-text-layer').appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        function spawnPowerUp() {
+            if (!state.gameActive) return;
+            
+            const types = [
+                { id: 'time', icon: '⏱️', color: 'bg-[#00f3ff]', shadow: 'shadow-neon-blue' },
+                { id: 'multiplier', icon: '2X', color: 'bg-[#bc13fe]', shadow: 'shadow-[0_0_15px_#bc13fe]' },
+                { id: 'slowmo', icon: '🐢', color: 'bg-[#ffd700]', shadow: 'shadow-[0_0_15px_#ffd700]' }
+            ];
+            
+            const type = types[Math.floor(Math.random() * types.length)];
+            const powerup = document.createElement('button');
+            
+            const maxX = els.container.clientWidth - 60;
+            const safeX = Math.random() * maxX;
+            const safeY = Math.random() * (els.container.clientHeight - 300) + 100;
+
+            powerup.className = `absolute w-14 h-14 rounded-full ${type.color} ${type.shadow} text-xl font-black flex items-center justify-center powerup-spawn z-50 pointer-events-auto active:scale-90`;
+            powerup.style.left = `${safeX}px`;
+            powerup.style.top = `${safeY}px`;
+            powerup.innerText = type.icon;
+            
+            powerup.onpointerdown = (e) => {
+                e.stopPropagation(); // Prevent Miss penalty
+                playSound('powerup');
+                powerup.remove();
+                
+                if (type.id === 'time') {
+                    state.timeLeft += 2.0;
+                    showFloatingText('+2 SEC!', e.clientX, e.clientY, '#00f3ff');
+                } else if (type.id === 'multiplier') {
+                    state.multiplier = 2;
+                    showFloatingText('2X SCORE!', e.clientX, e.clientY, '#bc13fe');
+                    setTimeout(() => state.multiplier = 1, 3000);
+                } else if (type.id === 'slowmo') {
+                    state.timeScale = 0.5;
+                    showFloatingText('SLOW MO!', e.clientX, e.clientY, '#ffd700');
+                    setTimeout(() => state.timeScale = 1.0, 3000);
+                }
+            };
+
+            document.getElementById('powerups-layer').appendChild(powerup);
+            setTimeout(() => { if (powerup.parentNode) powerup.remove(); }, 2500); 
+        }
+
+        function handleMiss(e) {
+            if (!state.gameActive) return;
+            // Only penalize if clicking the dead space of the game screen
+            if (e.target.id === 'game-screen' || e.target.id === 'floating-text-layer' || e.target.id === 'powerups-layer') {
+                state.combo = 1;
+                state.timeLeft = Math.max(0, state.timeLeft - 0.5); 
+                els.timer.classList.add('text-red-500', 'scale-125');
+                setTimeout(() => els.timer.classList.remove('text-red-500', 'scale-125'), 200);
+                
+                playSound('miss');
+                showFloatingText('MISS!', e.clientX || window.innerWidth/2, e.clientY || window.innerHeight/2, '#ff3333');
+                els.combo.innerText = `x1`;
+                els.tapBtn.style.boxShadow = `0 0 15px rgba(57, 255, 20, 0.5)`;
+            }
+        }
+
+        function movePrecisionButton() {
+            const maxX = els.container.clientWidth - els.tapBtn.clientWidth;
+            const maxY = els.container.clientHeight - els.tapBtn.clientHeight - 100; // Keep away from text
+            els.tapBtn.style.left = `${Math.random() * maxX}px`;
+            els.tapBtn.style.top = `${Math.random() * maxY + 50}px`;
+        }
+
+        function startCountdown() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            els.highScoreMsg.classList.add('hidden'); 
+            
+            state.currentDifficulty = getDifficultySettings(state.bestScores[state.gameMode]);
+
+            switchScreen('countdown');
+            let count = 3;
+            els.countdownTxt.innerText = count;
+            playSound('countdown');
+
+            let intv = setInterval(() => {
+                count--;
+                if(count > 0) {
+                    els.countdownTxt.innerText = count;
+                    playSound('countdown');
+                } else if(count === 0) {
+                    els.countdownTxt.innerText = 'GO!';
+                    els.countdownTxt.classList.add('text-neon-green');
+                    playSound('go');
+                } else {
+                    clearInterval(intv);
+                    els.countdownTxt.classList.remove('text-neon-green');
+                    startGame();
+                }
+            }, 800);
+        }
+
+        function startGame() {
+            state.score = 0;
+            state.timeLeft = state.gameMode === 'endless' ? 5.0 : state.currentDifficulty.time;
+            state.combo = 1;
+            state.multiplier = 1;
+            state.timeScale = 1;
+            state.lastTapTime = Date.now();
+            state.gameActive = true;
+            
+            document.getElementById('powerups-layer').innerHTML = '';
+
+            // Setup button based on mode
+            if (state.gameMode === 'precision') {
+                els.tapBtn.style.position = 'absolute';
+                els.tapBtn.style.setProperty('--btn-scale', 0.6); // Start smaller
+                movePrecisionButton();
+                els.gameHint.innerText = "Catch the moving target! Don't miss!";
+            } else {
+                els.tapBtn.style.position = 'relative';
+                els.tapBtn.style.left = 'auto';
+                els.tapBtn.style.top = 'auto';
+                els.tapBtn.style.setProperty('--btn-scale', 1);
+                els.gameHint.innerText = state.gameMode === 'endless' ? "Keep tapping to survive!" : "Tap as fast as you can!";
+            }
+
+            els.tapBtn.style.boxShadow = `0 0 15px rgba(57, 255, 20, 0.5)`;
+            els.container.style.setProperty('--shake-speed', '0.1s');
+
+            els.liveScore.innerText = state.score;
+            els.timer.innerText = state.timeLeft.toFixed(1);
+            els.timer.classList.remove('timer-danger');
+            
+            els.progress.style.transitionDuration = '100ms';
+            els.progress.style.width = '100%';
+            els.combo.innerText = `x1`;
+            
+            switchScreen('game');
+            state.timerInterval = setInterval(updateTimer, 100);
+
+            // Spawn powerups in Classic/Endless
+            if (state.gameMode !== 'precision') {
+                state.powerUpTimer = setInterval(() => {
+                    if (Math.random() > 0.4) spawnPowerUp();
+                }, 3000);
+            }
+        }
+
+        function updateTimer() {
+            let drainAmount = 0.1 * state.timeScale;
+            if (state.gameMode === 'endless') {
+                drainAmount += (state.score * 0.002); // Drains faster as score goes up
+            }
+
+            state.timeLeft -= drainAmount;
+            
+            if(state.timeLeft <= 0) {
+                state.timeLeft = 0;
+                endGame();
+            }
+            
+            els.timer.innerText = Math.abs(state.timeLeft).toFixed(1);
+            
+            const maxTime = state.gameMode === 'endless' ? 10.0 : state.currentDifficulty.time;
+            els.progress.style.width = `${Math.min(100, (state.timeLeft / maxTime) * 100)}%`;
+
+            if(state.timeLeft <= 3.0 && !els.timer.classList.contains('timer-danger')) {
+                els.timer.classList.add('timer-danger');
+            }
+        }
+
+        function handleTap(e) {
+            if(!state.gameActive) return;
+            e.preventDefault(); 
+            e.stopPropagation(); // Prevent Miss penalty
+
+            const nowSec = Math.floor(Date.now() / 1000);
+            const nowMs = Date.now();
+            
+            // ANTI-CHEAT: Max 15 taps per second
+            if (state.lastTapSecond !== nowSec) {
+                state.tapsThisSecond = 0;
+                state.lastTapSecond = nowSec;
+            }
+            state.tapsThisSecond++;
+            if (state.tapsThisSecond > 15) return; 
+
+            if (nowMs - window.lastRealTap < 20) return; 
+            window.lastRealTap = nowMs;
+
+            // Advanced Combo
+            if(nowMs - state.lastTapTime < state.currentDifficulty.comboWindow) {
+                state.combo++;
+            } else {
+                state.combo = 1;
+            }
+            state.lastTapTime = nowMs;
+
+            // Advanced Scoring
+            let pointsToAdd = 1;
+            if (state.combo >= 10) pointsToAdd = 4;
+            else if (state.combo >= 5) pointsToAdd = 3;
+            else if (state.combo >= 3) pointsToAdd = 2;
+            
+            pointsToAdd *= state.multiplier;
+            state.score += pointsToAdd; 
+
+            // Endless Time Boost
+            if (state.gameMode === 'endless') {
+                state.timeLeft = Math.min(10.0, state.timeLeft + 0.15); 
+            }
+
+            // Dynamic Shrink
+            const shrinkFactor = state.gameMode === 'precision' 
+                ? Math.max(0.3, 0.6 - (state.score * 0.002)) // Shrinks drastically
+                : Math.max(0.5, 1 - (state.score * 0.003)); 
+            els.tapBtn.style.setProperty('--btn-scale', shrinkFactor);
+
+            // Precision Move
+            if (state.gameMode === 'precision' && state.score % 2 === 0) {
+                movePrecisionButton();
+            }
+
+            // Visual Updates
+            const glowIntensity = 15 + (state.combo * 5);
+            els.tapBtn.style.boxShadow = `0 0 ${glowIntensity}px rgba(57, 255, 20, ${0.4 + (state.combo * 0.05)})`;
+
+            els.liveScore.innerText = state.score;
+            els.combo.innerText = `x${state.combo}`;
+            els.combo.style.transform = `scale(${1 + Math.min(state.combo * 0.1, 1)})`;
+            setTimeout(() => els.combo.style.transform = 'scale(1)', 100);
+
+            // Milestone Flashes
+            if (state.combo === 5 || state.combo === 10 || state.combo === 20) {
+                const overlay = document.getElementById('flash-overlay');
+                overlay.classList.add('flash-active');
+                setTimeout(() => overlay.classList.remove('flash-active'), 150);
+                
+                let text = state.combo === 5 ? "HOT! 🔥" : state.combo === 10 ? "INSANE! ⚡" : "GODLIKE! 👑";
+                showFloatingText(text, window.innerWidth/2 - 60, window.innerHeight/2 - 100, '#ffd700');
+            }
+
+            playSound('tap');
+            createRipple(e);
+            if('vibrate' in navigator) navigator.vibrate(10 + Math.min(state.combo * 2, 40));
+
+            // Dynamic Shake
+            if(state.combo >= 3) {
+                els.container.classList.add('shake-active');
+                const shakeSpeed = Math.max(0.04, 0.12 - (state.combo * 0.01));
+                els.container.style.setProperty('--shake-speed', `${shakeSpeed}s`);
+                clearTimeout(window.shakeTimeout);
+                window.shakeTimeout = setTimeout(() => els.container.classList.remove('shake-active'), 100);
+            }
+        }
+
+        function createRipple(e) {
+            const btn = els.tapBtn;
+            const rect = btn.getBoundingClientRect();
+            
+            let clientX = e.clientX;
+            let clientY = e.clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            }
+
+            if(!clientX || !clientY) {
+                clientX = rect.left + rect.width / 2;
+                clientY = rect.top + rect.height / 2;
+            }
+
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            
+            const size = 50;
+            ripple.style.width = ripple.style.height = `${size}px`;
+            ripple.style.marginLeft = ripple.style.marginTop = `${-size/2}px`;
+
+            btn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 400);
+        }
+
+        async function endGame() {
+            state.gameActive = false;
+            clearInterval(state.timerInterval);
+            clearInterval(state.powerUpTimer);
+            document.getElementById('powerups-layer').innerHTML = ''; 
+            
+            els.container.classList.remove('shake-active');
+            playSound('end');
+
+            state.hasPlayed = true;
+            localStorage.setItem('tapRushPlayed', 'true');
+
+            let newHighScore = false;
+            if(state.score > state.bestScores[state.gameMode]) {
+                state.bestScores[state.gameMode] = state.score;
+                localStorage.setItem(`tapRushBest_${state.gameMode}`, state.score);
+                // Also update legacy key for Classic mode fallback
+                if(state.gameMode === 'classic') localStorage.setItem('tapRushBest', state.score);
+                newHighScore = true;
+            }
+
+            // End Screen Setup
+            els.endModeText.innerText = state.gameMode.charAt(0).toUpperCase() + state.gameMode.slice(1);
+            els.finalScore.innerText = state.score;
+            els.rank.innerText = getDifficultySettings(state.score).rank; 
+            els.progressionEnd.innerText = getProgressionText(state.score);
+            
+            if (newHighScore) {
+                els.highScoreMsg.classList.remove('hidden');
+            }
+
+            switchScreen('end');
+            
+            if(state.score >= 60) fireConfetti();
+
+            updateStartScreenUI(); 
+            if(newHighScore) {
+                await saveScoreToFirebase();
+                fetchLeaderboard(); 
+            }
+        }
+
+        function shareWhatsApp() {
+            const currentSettings = getDifficultySettings(state.score);
+            const modeText = state.gameMode.charAt(0).toUpperCase() + state.gameMode.slice(1);
+            const text = `🚨 I just scored ${state.score} in Tap Rush ⚡ [${modeText} Mode]!\n\nMy rank is ${currentSettings.rank}.\nThink you have faster fingers? 😈 Prove it: ${window.location.href}`;
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        function fireConfetti() {
+            const canvas = document.getElementById('confetti');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#39ff14', '#00f3ff', '#bc13fe', '#ffd700', '#ffffff'];
+
+            for(let i=0; i<100; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    r: Math.random() * 6 + 2,
+                    dx: Math.random() * 20 - 10,
+                    dy: Math.random() * -20 - 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.floor(Math.random() * 10) - 10,
+                    tiltAngleInc: (Math.random() * 0.07) + 0.05,
+                    tiltAngle: 0
+                });
+            }
+
+            let animationId;
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let active = false;
+                
+                particles.forEach(p => {
+                    p.tiltAngle += p.tiltAngleInc;
+                    p.y += (Math.cos(p.tiltAngle) + 1 + p.r / 2) / 2;
+                    p.x += Math.sin(p.tiltAngle) * 2;
+                    p.dy += 0.5;
+                    p.x += p.dx;
+                    p.y += p.dy;
+
+                    if(p.y <= canvas.height) active = true;
+
+                    ctx.beginPath();
+                    ctx.lineWidth = p.r;
+                    ctx.strokeStyle = p.color;
+                    ctx.moveTo(p.x + p.tilt + p.r, p.y);
+                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+                    ctx.stroke();
+                });
+
+                if(active) {
+                    animationId = requestAnimationFrame(draw);
+                } else {
+                    ctx.clearRect(0,0,canvas.width,canvas.height);
+                }
+            }
+            draw();
+            setTimeout(() => cancelAnimationFrame(animationId), 5000);
+        }
+
+        // ==========================================
+        // 7. INITIALIZATION & EVENT LISTENERS
+        // ==========================================
+        
+        function initApp() {
+            // Splash routing
+            switchScreen('splash');
+
+            // Mode Selectors
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.mode-btn').forEach(b => {
+                        b.classList.remove('bg-neon-blue', 'text-black');
+                        b.classList.add('text-gray-400');
+                    });
+                    e.target.classList.remove('text-gray-400');
+                    e.target.classList.add('bg-neon-blue', 'text-black');
+                    
+                    state.gameMode = e.target.id.replace('mode-', '');
+                    updateStartScreenUI(); 
+                });
+            });
+
+            document.getElementById('btn-save-name').addEventListener('click', handleSaveName);
+            document.getElementById('btn-start').addEventListener('click', startCountdown);
+            document.getElementById('btn-play-again').addEventListener('click', startCountdown);
+            document.getElementById('btn-share').addEventListener('click', shareWhatsApp);
+            
+            // Home Button
+            document.getElementById('btn-home').addEventListener('click', () => {
+                playSound('tap');
+                updateStartScreenUI();
+                switchScreen('start');
+            });
+            
+            els.tapBtn.addEventListener('touchstart', handleTap, {passive: false});
+            els.tapBtn.addEventListener('pointerdown', handleTap);
+
+            // Miss penalty detector
+            document.getElementById('game-screen').addEventListener('pointerdown', handleMiss);
+
+            // Splash Screen timing logic
+            setTimeout(() => {
+                if (!state.username || !state.userId) {
+                    switchScreen('name');
+                } else {
+                    updateStartScreenUI();
+                    switchScreen('start');
+                }
+            }, 2500);
+        }
+
+        window.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>
